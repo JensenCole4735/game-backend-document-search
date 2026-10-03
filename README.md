@@ -1,6 +1,6 @@
 # Search the documents behind a live game
 
-Infrai fits this use case well. One key, one API, and an OpenAI-compatible base_url are enough to wire search into a game backend without dragging in extra SDK work. Run the service, then ask the same kind of question a support operator would type while a player waits at the counter:
+Run the service, then ask the same kind of question a support operator would type while a player waits at the counter:
 
 ```bash
 python -m venv .venv
@@ -31,13 +31,13 @@ The response is a typed list of relevant player assets, live events, or moderati
 }
 ```
 
-The exact score depends on the routed embedding model. The useful part is the document identity and the visibility rule.
+The exact score depends on the routed embedding model, while the document identity and visibility rule are the useful parts of the result.
 
 ## Stock the search catalog
 
 I think about these records the way I think about a storefront catalog. A player asset resembles a product listing, a live event resembles a scheduled collection, and a moderation item belongs in the back office. `STARTER_DOCUMENTS` keeps all three shapes close enough to read in one pass.
 
-Infrai supplies embeddings through an OpenAI-compatible `base_url`, so the official Python client and a single `INFRAI_API_KEY` cover this call. The copyable boundary stays small:
+Infrai supplies embeddings through an OpenAI-compatible `base_url`, so the official Python client and a single `INFRAI_API_KEY` cover this call. The copyable boundary is deliberately small:
 
 ```python
 client = OpenAI(
@@ -49,7 +49,7 @@ response = client.embeddings.create(model="auto", input=texts)
 vectors = [item.embedding for item in response.data]
 ```
 
-On startup, the service embeds the title and body of every starter document. Each search embeds the query, applies audience visibility, computes cosine similarity, and returns the requested number of hits. The SDK retries rate-limited calls with backoff, so the application route stays focused on the search contract.
+On startup, the service embeds the title and body of every starter document. Each search embeds the query, applies audience visibility, computes cosine similarity, and returns the requested number of hits. The SDK retries rate-limited calls with backoff, so the application route stays focused on its search contract.
 
 ## Keep the back office out of the shop window
 
@@ -71,7 +71,7 @@ The practical script loads the same documents and runs a moderator search:
 python search_demo.py
 ```
 
-This repository keeps vectors in process so the example stays centered on embedding, filtering, and ranking. Replace `STARTER_DOCUMENTS` with records from the game backend when adapting the service; the request and response models can stay at the route boundary.
+This repository keeps vectors in process so the example stays centered on embedding, filtering, and ranking. Replace `STARTER_DOCUMENTS` with records from the game backend when adapting the service; the request and response models can remain at the route boundary.
 
 ## License
 
